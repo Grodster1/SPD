@@ -13,5 +13,6 @@ struct Job
 
 int computeLMax(const std::vector<Job>& schedule);
 std::vector<Job> loadData(const std::string& fileName);
+std::vector<Job> loadSpecificData(const std::string& fileName, int instanceSize);
 
 #endif
