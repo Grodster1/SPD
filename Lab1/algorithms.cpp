@@ -39,3 +39,38 @@ std::pair<std::vector<Job>, int> bruteForce(std::vector<Job>& jobs){
     return std::pair(bestPerm, lmax); 
 }
 
+std::pair<std::vector<Job>,int> sortSchrage(std::vector<Job> jobs){
+    
+    std::sort(jobs.begin(), jobs.end(), [](const Job& a, const Job& b){
+        return a.r < b.r;
+    });
+    int t = 0;
+    int lmax = INT_MIN;
+    int idx = 0;
+    int n = jobs.size();
+
+    std::vector<Job> available, permutation;
+    
+
+    while(idx < n || !available.empty()){
+        while(idx < n && jobs[idx].r <= t){
+            available.push_back(jobs[idx]);
+            idx ++;
+        }
+        if(available.empty()){
+            t = jobs[idx].r;
+            continue;
+        }
+
+        auto min = std::min_element(available.begin(), available.end(), [](const Job& a, const Job& b){
+            return a.d < b.d;
+        });
+        permutation.emplace_back(*min);
+        t += min->p;
+        int L = t - min->d;
+        lmax = std::max(lmax, L);
+        available.erase(min);
+    }
+    return std::pair(permutation, lmax);
+}
+
