@@ -39,3 +39,16 @@ std::pair<std::vector<Job>, int> bruteForce(std::vector<Job>& jobs){
     return std::pair(bestPerm, lmax); 
 }
 
+std::pair<std::vector<Job>, int> vegasSort(std::vector<Job> & jobs){
+    std::vector<Job> bestPerm = jobs;
+    int lmax = computeLMax(jobs);
+    for(int i = 0; i < jobs.size(); ++i){
+        std::random_shuffle(jobs.begin(), jobs.end());
+        int currentLmax = computeLMax(jobs);
+        if(currentLmax < lmax){
+            lmax = currentLmax;
+            bestPerm = jobs;
+        }
+    }
+    return std::pair(bestPerm, lmax);
+}
