@@ -8,6 +8,7 @@ int sortByR(std::vector<Job> & jobs);
 int sortByD(std::vector<Job> & jobs);
 std::pair<std::vector<Job>, int> bruteForce(std::vector<Job> & jobs);
 std::pair<std::vector<Job>, int> sortSchrage(std::vector<Job> & jobs);
+std::pair<std::vector<Job>, int> vegasSort(std::vector<Job> & jobs);
 
 
 #endif

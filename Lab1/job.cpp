@@ -32,5 +32,28 @@ std::vector<Job> loadData(const std::string& fileName){
     }
 
     return jobs;
+}
 
+std::vector<Job> loadSpecificData(const std::string& fileName, int instanceSize){
+    std::ifstream file(fileName);
+    if(!file.is_open()){
+        std::cerr << "Can't open the file: " << fileName << std::endl;
+        return {};
+    }
+
+    int n;
+    file >> n;
+    if(instanceSize > n){
+        std::cerr << "Instance size exceeds the number of available jobs in the file." << std::endl;
+        return {};
+    }
+
+    std::vector<Job> jobs(instanceSize);
+
+    for(int i = 0; i < instanceSize; ++i){
+        jobs[i].id = i;
+        file >> jobs[i].r >> jobs[i].p >> jobs[i].d;
+    }
+
+    return jobs;
 }
