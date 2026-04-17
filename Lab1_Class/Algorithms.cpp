@@ -3,6 +3,7 @@
 #include <climits>
 #include <iostream>
 #include <random>
+#include <queue>
 
 Solution sortByR(const Instance& inst){
     Solution sol;
@@ -55,16 +56,19 @@ Solution schrage(const Instance & inst){
         return a.r < b.r;
     });
 
+    auto comp = [](const Job& a, const Job& b){return a.d > b.d;}; //odwrotnie bo domyślnie jest max-heap
+    std::priority_queue<Job, std::vector<Job>, decltype(comp)> G(comp);
     int t=0;
     int lmax = INT_MIN;
     int idx = 0;
     int n = N.size();
-    std::vector<Job> G;
+
+    //std::vector<Job> G;
     Solution sol;
 
     while(idx < n || !G.empty()){
         while (idx < n && N[idx].r <= t) {
-            G.push_back(N[idx]);
+            G.push(N[idx]);
             idx++;
         }
  
@@ -73,14 +77,63 @@ Solution schrage(const Instance & inst){
             continue;
         }
  
-        auto it = std::min_element(G.begin(), G.end(),
-            [](const Job& a, const Job& b) { return a.d < b.d; });
+        Job best = G.top();
+        G.pop();
  
-        sol.schedule.push_back(*it);
-        t += it->p;
-        int L = t - it->d;
+        sol.schedule.push_back(best);
+        t += best.p;
+        int L = t - best.d;
         lmax = std::max(lmax, L);
-        G.erase(it);
+    }
+ 
+    sol.lmax = lmax;
+    return sol;
+}
+
+Solution schragePreemptive(const Instance & inst){
+    std::vector<Job> N = inst.jobs;
+    std::sort(N.begin(), N.end(), [](const Job& a, const Job& b){
+        return a.r < b.r;
+    });
+
+    auto comp = [](const Job& a, const Job& b){return a.d > b.d;}; 
+    std::priority_queue<Job, std::vector<Job>, decltype(comp)> G(comp);
+    int t=0;
+    int lmax = INT_MIN;
+    int idx = 0;
+    int n = N.size();
+
+    Solution sol;
+
+    while(idx < n || !G.empty()){
+        while (idx < n && N[idx].r <= t) {
+            G.push(N[idx]);
+            idx++;
+        }
+ 
+        if (G.empty()) {
+            t = N[idx].r;
+            continue;
+        }
+ 
+        Job best = G.top();
+        G.pop();
+ 
+        sol.schedule.push_back(best);
+        int r_next = (idx < n) ? N[idx].r : INT_MAX;
+        int t_end = t + best.p;
+        int t_new = std::min(t_end, r_next);
+
+        best.p -= (t_new - t);
+        t = t_new;
+
+        if(best.p == 0){
+            int L = t-best.d;
+            lmax = std::max(lmax, L);
+        }
+        else{
+            G.push(best);
+        }
     }
  
     sol.lmax = lmax;
@@ -103,3 +156,4 @@ Solution vegasSort(const Instance& inst){
     }
     return best;
 }
+
