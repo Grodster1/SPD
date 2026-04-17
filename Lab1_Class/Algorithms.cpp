@@ -1,7 +1,8 @@
-#include <Algorithms.h>
+#include "Algorithms.h"
 #include <algorithm>
 #include <climits>
 #include <iostream>
+#include <random>
 
 Solution sortByR(const Instance& inst){
     Solution sol;
@@ -20,6 +21,9 @@ Solution sortByD(const Instance& inst){
     std::sort(sol.schedule.begin(), sol.schedule.end(), [](const Job& a, const Job& b){
         return a.d < b.d;
     });
+     
+    sol.computeLmax();
+    return sol;
 }
 
 Solution bruteForce(const Instance& inst){
@@ -58,7 +62,7 @@ Solution schrage(const Instance & inst){
     std::vector<Job> G;
     Solution sol;
 
-    while(idx < n || G.empty()){
+    while(idx < n || !G.empty()){
         while (idx < n && N[idx].r <= t) {
             G.push_back(N[idx]);
             idx++;
@@ -81,4 +85,21 @@ Solution schrage(const Instance & inst){
  
     sol.lmax = lmax;
     return sol;
+}
+
+Solution vegasSort(const Instance& inst){
+    std::vector<Job> perm = inst.jobs;
+    Solution best;
+    best.schedule = perm;
+    best.computeLmax();
+    for(int i = 0; i < inst.jobs.size(); ++i){
+        std::shuffle(perm.begin(), perm.end(), std::mt19937{std::random_device{}()});
+        Solution current;
+        current.schedule = perm;
+        current.computeLmax();
+        if(current.lmax < best.lmax){
+            best=current;
+        }
+    }
+    return best;
 }
