@@ -30,6 +30,7 @@ int main(int argc, char* argv[]) {
         {"Sort by R", sortByR},
         {"Sort by D", sortByD},
         {"Schrage", schrage},
+        {"Schrage Pr.", schragePreemptive},
         {"Vegas", vegasSort}
     };
 
