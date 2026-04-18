@@ -18,7 +18,7 @@ Instance Instance::fromFile(const std::string& filename){
     inst.jobs.resize(n);
     for(int i =0; i < n; ++i){
         inst.jobs[i].id = i;
-        file >> inst.jobs[i].r >> inst.jobs[i].p >> inst.jobs[i].d;
+        file >> inst.jobs[i].p >> inst.jobs[i].r >> inst.jobs[i].d;
     }
     return inst;
 }
@@ -43,7 +43,7 @@ Instance Instance::fromFile(const std::string& filename, int n){
  
     for (int i = 0; i < n; ++i) {
         inst.jobs[i].id = i;
-        file >> inst.jobs[i].r >> inst.jobs[i].p >> inst.jobs[i].d;
+        file >> inst.jobs[i].p >> inst.jobs[i].r >> inst.jobs[i].d;
     }
  
     return inst;

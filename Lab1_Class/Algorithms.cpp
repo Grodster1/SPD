@@ -130,6 +130,7 @@ Solution schragePreemptive(const Instance & inst){
         if(best.p == 0){
             int L = t-best.d;
             lmax = std::max(lmax, L);
+            sol.schedule.push_back(best);
         }
         else{
             G.push(best);
