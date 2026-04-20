@@ -10,3 +10,10 @@ add_executable(
     Algorithms.cpp
     Problem.cpp
 )
+
+add_executable(
+    benchmark
+    benchmark.cpp
+    Algorithms.cpp
+    Problem.cpp
+)
