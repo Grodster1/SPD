@@ -17,3 +17,9 @@ add_executable(
     Algorithms.cpp
     Problem.cpp
 )
+
+add_executable(benchmark100
+    benchmark100.cpp
+    Problem.cpp
+    Algorithms.cpp
+)
