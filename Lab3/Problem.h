@@ -12,6 +12,7 @@ struct Job{
 class Instance{
 public:
     std::vector<Job> jobs;
+    int m;
     static Instance fromFile(const std::string& filename);
     static Instance fromFile(const std::string& filename, int n);
     static Instance generateRandom(int n, int m, int maxP);
@@ -33,7 +34,7 @@ public:
 
     void assign(int jobID, int p, int machine);
     void computeCMax(const std::vector<Job>& jobs);
-    void print();
+    void print() const;
 };
 
 
