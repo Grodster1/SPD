@@ -6,9 +6,7 @@
 
 struct Job{
     int id;
-    int r; //release date
     int p; //processing time
-    int d; //due date
 };
 
 class Instance{
@@ -16,18 +14,26 @@ public:
     std::vector<Job> jobs;
     static Instance fromFile(const std::string& filename);
     static Instance fromFile(const std::string& filename, int n);
+    static Instance generateRandom(int n, int m, int maxP);
     int size() const {return jobs.size();}
+    int totalP() const;
     void print() const;
-
 };
 
 class Solution{
 public: 
-    std::vector<Job> schedule;
-    int lmax;
+    int cmax;
+    int m;
 
-    void computeLmax();
-    void print() const;
+    std::vector<int> assignment;
+    std::vector<int> loads;
+
+    Solution() : cmax(0), m(0) {};
+    Solution(int numMachines);
+
+    void assign(int jobID, int p, int machine);
+    void computeCMax(const std::vector<Job>& jobs);
+    void print();
 };
 
 
