@@ -108,4 +108,65 @@ Solution bruteForceP2(const Instance & inst){
     return sol;
 }
 
+Solution ptasP2(const Instance & inst, double epsilon){
+    int sumP = inst.totalP();
+    int threshold = epsilon * sumP/2;
+
+    int n = inst.size();
+    int bestCMax = INT_MAX;
+    int cmax, bestMask;
+
+    Solution sol(inst.m);
+
+    auto const condition_large = [threshold](const Job& j){return j.p > threshold;};
+    auto const condition_small = [threshold](const Job& j){return j.p <= threshold;};
+
+    std::vector<Job> largeJobs;
+    std::vector<Job> smallJobs;
+
+    std::copy_if(inst.jobs.begin(), inst.jobs.end(), std::back_inserter(largeJobs), condition_large);
+    std::copy_if(inst.jobs.begin(), inst.jobs.end(), std::back_inserter(smallJobs), condition_small);
+
+    std::vector<Job> sorted = smallJobs;
+    std::sort(sorted.begin(), sorted.end(), [](const Job & a, const Job & b){
+        return a.p > b.p;
+    });
+
+    for(int i = 0; i < (1<<largeJobs.size()); ++i){
+        int loads[2] = {0, 0};
+        for (int bit = 0; bit < (int)largeJobs.size(); ++bit) {
+            loads[(i >> bit) & 1] += largeJobs[bit].p;
+        }
+        for (const auto& j : sorted) {
+            int minM = (loads[0] <= loads[1]) ? 0 : 1;
+            loads[minM] += j.p;
+        }
+    
+        cmax = std::max(loads[0], loads[1]);
+        if(cmax < bestCMax){
+            bestCMax = cmax;
+            bestMask = i;
+        } 
+    }
+
+    sol.assignment.resize(n, -1);
+
+    for (int bit = 0; bit < (int)largeJobs.size(); ++bit) {
+        sol.assignment[largeJobs[bit].id] = (bestMask >> bit) & 1;
+    }
+    sol.loads.assign(2, 0);
+
+    for (int bit = 0; bit < (int)largeJobs.size(); ++bit) {
+        sol.loads[(bestMask >> bit) & 1] += largeJobs[bit].p;
+    }
+
+    for (const auto& j : sorted) {
+        int minM = (sol.loads[0] <= sol.loads[1]) ? 0 : 1;
+        sol.assign(j.id, j.p, minM);
+    }
+
+    return sol;
+
+}
+
 
