@@ -9,3 +9,9 @@ add_executable(scheduling
     Problem.cpp
     Algorithms.cpp)
 
+add_executable(benchmark
+    benchmark.cpp
+    Problem.cpp
+    Algorithms.cpp
+)
+
