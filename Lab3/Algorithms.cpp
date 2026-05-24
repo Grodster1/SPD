@@ -77,3 +77,35 @@ Solution dynamicProgP2(const Instance & inst){
 
 }
 
+Solution bruteForceP2(const Instance & inst){
+    int n = inst.size();
+    int bestCMax = INT_MAX;
+    int load1, load2, cmax, bestMask;
+    Solution sol(inst.m);
+    //bitmask
+    for(int i = 0; i < (1<<n); ++i){
+        load1 = 0;
+        load2 = 0;
+        for(int bit = 0; bit < n; ++bit){
+            if((i>>bit) & 1){
+                load2 += inst.jobs[bit].p; 
+            }
+            else{
+                load1 += inst.jobs[bit].p; 
+            }
+        }
+        cmax = std::max(load1, load2);
+        if(cmax < bestCMax){
+            bestCMax = cmax;
+            bestMask = i;
+        } 
+    }
+    sol.assignment.resize(n);
+    for(int bit = 0; bit < n; ++bit){
+        sol.assignment[bit] = (bestMask >> bit) & 1;
+    }
+    sol.computeCMax(inst.jobs);
+    return sol;
+}
+
+
