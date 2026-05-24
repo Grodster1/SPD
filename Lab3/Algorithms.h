@@ -14,6 +14,6 @@ Solution bruteForceP2(const Instance & inst);
 
 //4.5
 Solution ptasP2(const Instance & inst, double epsilon);
-Solution fptasP2(const Instance & inst);
+Solution fptasP2(const Instance & inst, double epsilon);
 
 #endif

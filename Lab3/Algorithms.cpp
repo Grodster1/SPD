@@ -114,7 +114,7 @@ Solution ptasP2(const Instance & inst, double epsilon){
 
     int n = inst.size();
     int bestCMax = INT_MAX;
-    int cmax, bestMask;
+    int cmax, bestMask=0;
 
     Solution sol(inst.m);
 
@@ -131,6 +131,10 @@ Solution ptasP2(const Instance & inst, double epsilon){
     std::sort(sorted.begin(), sorted.end(), [](const Job & a, const Job & b){
         return a.p > b.p;
     });
+
+    if (largeJobs.empty()) {
+        return lpt(inst);
+    }
 
     for(int i = 0; i < (1<<largeJobs.size()); ++i){
         int loads[2] = {0, 0};
@@ -165,8 +169,59 @@ Solution ptasP2(const Instance & inst, double epsilon){
         sol.assign(j.id, j.p, minM);
     }
 
+    sol.cmax = *std::max_element(sol.loads.begin(), sol.loads.end());
+
     return sol;
 
 }
 
-
+Solution fptasP2(const Instance& inst, double epsilon) {
+    int n = inst.size();
+    int sumP = inst.totalP();
+    
+    int K = std::max(1, (int)(epsilon * sumP / (2.0 * n)));
+    
+    std::vector<int> scaledP(n);
+    for (int i = 0; i < n; ++i) {
+        scaledP[i] = inst.jobs[i].p / K;
+    }
+    
+    int scaledSum = 0;
+    for (int p : scaledP) scaledSum += p;
+    int half = scaledSum / 2 + 1;
+    
+    std::vector<std::vector<int>> T(n + 1, std::vector<int>(half, 0));
+    T[0][0] = 1;
+    
+    for (int j = 1; j <= n; ++j) {
+        int pj = scaledP[j - 1];
+        for (int k = 0; k < half; ++k) {
+            if (T[j-1][k] == 1) {
+                T[j][k] = 1;
+            }
+            if (k >= pj && T[j-1][k - pj] == 1) {
+                T[j][k] = 1;
+            }
+        }
+    }
+    
+    int bestK = 0;
+    for (int k = 0; k < half; ++k) {
+        if (T[n][k] == 1) bestK = k;
+    }
+    
+    Solution sol(inst.m);
+    sol.assignment.resize(n, -1);
+    int k = bestK;
+    for (int j = n; j >= 1; --j) {
+        if (T[j-1][k] == 1) {
+            sol.assignment[j-1] = 1;
+        } else {
+            sol.assignment[j-1] = 0;
+            k -= scaledP[j-1];
+        }
+    }
+    
+    sol.computeCMax(inst.jobs);
+    return sol;
+}
