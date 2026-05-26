@@ -8,11 +8,12 @@
 
 void runComparison() {
     std::cout << "Instance\tJohnson Cmax\tJohnson (ms)\t"
-              << "M1 Cmax\tM1 (ms)\t"
+              << "Tabu Search Cmax\tTabu Search (ms)\t"
               << "NEH Cmax\tNEH (ms)\t"
+              << "QNEH Cmax\tQNEH (ms)\t"
               << "B&B Cmax\tB&B (ms)\t"
               << "BruteForce Cmax\tBruteForce (ms)\n";
-    std::cout << std::string(140, '-') << "\n";
+    std::cout << std::string(160, '-') << "\n";
     
     // Open output file
     std::ofstream outFile("../results.txt");
@@ -25,7 +26,7 @@ void runComparison() {
     outFile << "Instance\tAlgorithm\tCmax\tOptimal\tRelativeError(%)\tTime(ms)\n";
     outFile << std::string(80, '-') << "\n";
     
-    std::vector<int> instances = {10, 20, 50, 100, 500, 1000};
+    std::vector<int> instances = {10, 20, 50, 100, 500};
     bool firstInstance = true;
     
     for (int n : instances) {
@@ -65,17 +66,17 @@ void runComparison() {
                << "\t" << std::fixed << std::setprecision(3) << johnsonError << "\t" 
                << johnsonTime.count() << "\n";
         
-        // M1
+        // Tabu Search
         start = std::chrono::high_resolution_clock::now();
-        auto m1Result = Algorithms::m1(problem);
+        auto tabuResult = Algorithms::tabuSearch(problem);
         end = std::chrono::high_resolution_clock::now();
-        std::chrono::duration<double, std::milli> m1Time = end - start;
-        double m1Error = (optimalValue > 0) ? 
-            (100.0 * (m1Result.second - optimalValue) / optimalValue) : 0;
-        
-        outFile << n << "x2\tM1\t" << m1Result.second << "\t" << optimalValue 
-               << "\t" << std::fixed << std::setprecision(3) << m1Error << "\t" 
-               << m1Time.count() << "\n";
+        std::chrono::duration<double, std::milli> tabuTime = end - start;
+        double tabuError = (optimalValue > 0) ? 
+            (100.0 * (tabuResult.second - optimalValue) / optimalValue) : 0;
+
+        outFile << n << "x2\tTabu Search\t" << tabuResult.second << "\t" << optimalValue 
+               << "\t" << std::fixed << std::setprecision(3) << tabuError << "\t" 
+               << tabuTime.count() << "\n";
         
         // NEH
         start = std::chrono::high_resolution_clock::now();
@@ -88,6 +89,18 @@ void runComparison() {
         outFile << n << "x2\tNEH\t" << nehResult.second << "\t" << optimalValue 
                << "\t" << std::fixed << std::setprecision(3) << nehError << "\t" 
                << nehTime.count() << "\n";
+        
+        // QNEH
+        start = std::chrono::high_resolution_clock::now();
+        auto qnehResult = Algorithms::qneh(problem);
+        end = std::chrono::high_resolution_clock::now();
+        std::chrono::duration<double, std::milli> qnehTime = end - start;
+        double qnehError = (optimalValue > 0) ? 
+            (100.0 * (qnehResult.second - optimalValue) / optimalValue) : 0;
+        
+        outFile << n << "x2\tQNEH\t" << qnehResult.second << "\t" << optimalValue 
+               << "\t" << std::fixed << std::setprecision(3) << qnehError << "\t" 
+               << qnehTime.count() << "\n";
         
         // Branch & Bound
         start = std::chrono::high_resolution_clock::now();
@@ -104,8 +117,9 @@ void runComparison() {
         // Console output
         std::cout << n << "x2\t\t" 
                   << johnsonResult.second << "\t\t" << std::fixed << std::setprecision(3) << johnsonTime.count() << "\t\t"
-                  << m1Result.second << "\t\t" << m1Time.count() << "\t\t"
+                  << tabuResult.second << "\t\t" << tabuTime.count() << "\t\t"
                   << nehResult.second << "\t\t" << nehTime.count() << "\t\t"
+                  << qnehResult.second << "\t\t" << qnehTime.count() << "\t\t"
                   << bbResult.second << "\t\t" << bbTime.count() << "\t\t";
         
         if (firstInstance) {
@@ -151,15 +165,15 @@ int main() {
         std::cout << "Testing " << n << "x" << m << " instance:\n";
         outFile << "\n" << n << "x" << m << " instance:\n";
         
-        // M1
+        // tabu search
         auto start = std::chrono::high_resolution_clock::now();
-        auto m1Result = Algorithms::m1(problem);
+        auto m1Result = Algorithms::tabuSearch(problem);
         auto end = std::chrono::high_resolution_clock::now();
         std::chrono::duration<double, std::milli> m1Time = end - start;
         
-        std::cout << "  M1:   Cmax = " << m1Result.second << ", Time = " << std::fixed << std::setprecision(3) << m1Time.count() << " ms\n";
-        outFile << n << "x" << m << "\tM1\t" << m1Result.second << "\t" << std::fixed << std::setprecision(3) << m1Time.count() << "\n";
-        
+        std::cout << "  Tabu Search:   Cmax = " << m1Result.second << ", Time = " << std::fixed << std::setprecision(3) << m1Time.count() << " ms\n";
+        outFile << n << "x" << m << "\tTabu Search\t" << m1Result.second << "\t" << std::fixed << std::setprecision(3) << m1Time.count() << "\n";
+
         // NEH
         start = std::chrono::high_resolution_clock::now();
         auto nehResult = Algorithms::neh(problem);
